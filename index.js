@@ -1,9 +1,15 @@
 const express = require('express');
+const admin = require('firebase-admin');
 const app = express();
 const dotenv = require('dotenv');
 const cors = require('cors');
 const port = process.env.PORT || 5000;
 const { MongoClient } = require('mongodb');
+const serviceAccount = require('./niche-react-firebase-adminsdk.json');
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+});
 
 app.use(cors());
 app.use(express.json());
@@ -15,6 +21,18 @@ const client = new MongoClient(uri, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
+
+async function verifyToken(req, res, next) {
+  if (req.headers.authorization?.startsWith('Bearer ')) {
+    const token = req.headers.authorization.split(' ')[1];
+
+    try {
+      const decodedUser = await admin.auth().verifyIdToken(token);
+      req.decodedEmail = decodedUser.email;
+    } catch (error) {}
+  }
+  next();
+}
 
 async function run() {
   try {
@@ -58,13 +76,25 @@ async function run() {
     });
 
     // Give admin role
-    app.put('/addAdmin', async (req, res) => {
+    app.put('/addAdmin', verifyToken, async (req, res) => {
       const user = req.body;
-      const filter = { email: user.email };
-      const updateDoc = { $set: { role: 'admin' } };
-      const result = await usersCollection.updateOne(filter, updateDoc);
-      console.log(result);
-      res.json(result);
+      const requester = req.decodedEmail;
+
+      if (requester) {
+        const requesterAccount = await usersCollection.findOne({
+          email: requester,
+        });
+        if (requesterAccount.role === 'admin') {
+          const filter = { email: user.email };
+          const updateDoc = { $set: { role: 'admin' } };
+          const result = await usersCollection.updateOne(filter, updateDoc);
+          res.json(result);
+        }
+      } else {
+        res
+          .status(401)
+          .json({ message: 'You are not permitted to do the operation!!!' });
+      }
     });
   } finally {
     // await client.close();
