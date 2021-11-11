@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
-  "scripts":{
+  "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js"
   },
@@ -11,6 +11,7 @@
     "cors": "^2.8.5",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
+    "firebase-admin": "^10.0.0",
     "mongodb": "^4.1.4"
   }
 }
