@@ -98,6 +98,12 @@ async function run() {
       }
     });
 
+    // Fetch all products
+    app.get('/products', async (req, res) => {
+      const result = await productsCollection.find({}).toArray();
+      res.json(result);
+    });
+
     // Save products to mongo
     app.post('/products', async (req, res) => {
       const product = req.body;
