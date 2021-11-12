@@ -105,6 +105,12 @@ async function run() {
       res.json(result);
     });
 
+    // Fecth only 6 produtcs
+    app.get('/productsHome', async (req, res) => {
+      const result = await productsCollection.find({}).limit(6).toArray();
+      res.json(result);
+    });
+
     // Save products to mongo
     app.post('/products', async (req, res) => {
       const product = req.body;
