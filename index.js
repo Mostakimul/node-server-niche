@@ -4,6 +4,7 @@ const app = express();
 const dotenv = require('dotenv');
 const cors = require('cors');
 const port = process.env.PORT || 5000;
+const ObjectId = require('mongodb').ObjectId;
 const { MongoClient } = require('mongodb');
 const serviceAccount = require('./niche-react-firebase-adminsdk.json');
 
@@ -108,6 +109,14 @@ async function run() {
     app.post('/products', async (req, res) => {
       const product = req.body;
       const result = await productsCollection.insertOne(product);
+      res.json(result);
+    });
+
+    // Delete a product
+    app.delete('/products/:id', async (req, res) => {
+      const pdId = req.params.id;
+      const query = { _id: ObjectId(pdId) };
+      const result = await productsCollection.deleteOne(query);
       res.json(result);
     });
   } finally {
