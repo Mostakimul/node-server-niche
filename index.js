@@ -39,6 +39,7 @@ async function run() {
     await client.connect();
     const database = client.db('nicheDB');
     const usersCollection = database.collection('users');
+    const productsCollection = database.collection('products');
 
     // Save user to mongo
     app.post('/users', async (req, res) => {
@@ -95,6 +96,13 @@ async function run() {
           .status(401)
           .json({ message: 'You are not permitted to do the operation!!!' });
       }
+    });
+
+    // Save products to mongo
+    app.post('/products', async (req, res) => {
+      const product = req.body;
+      const result = await productsCollection.insertOne(product);
+      res.json(result);
     });
   } finally {
     // await client.close();
