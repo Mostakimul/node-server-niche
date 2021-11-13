@@ -7,6 +7,7 @@ const port = process.env.PORT || 5000;
 const ObjectId = require('mongodb').ObjectId;
 const { MongoClient } = require('mongodb');
 const serviceAccount = require('./niche-react-firebase-adminsdk.json');
+const { json } = require('express');
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
@@ -51,7 +52,7 @@ async function run() {
       res.json(result);
     });
 
-    // fecth sigle user
+    // check user is admin or not
     app.get('/users/:email', async (req, res) => {
       const email = req.params.email;
       const query = { email: email };
@@ -61,6 +62,14 @@ async function run() {
         isAdmin = true;
       }
       res.json({ admin: isAdmin });
+    });
+
+    // fetch single user
+    app.get('/singleUser/:email', async (req, res) => {
+      const email = req.params.email;
+      const query = { email: email };
+      const user = await usersCollection.findOne(query);
+      res.json(user);
     });
 
     // update user if google sign
@@ -186,6 +195,12 @@ async function run() {
     app.post('/reviews', async (req, res) => {
       const review = req.body;
       const result = await reviewsCollection.insertOne(review);
+      res.json(result);
+    });
+
+    // fecth all reviews
+    app.get('/reviews', async (req, res) => {
+      const result = await reviewsCollection.find({}).toArray();
       res.json(result);
     });
   } finally {
