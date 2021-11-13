@@ -6,17 +6,15 @@ const cors = require('cors');
 const port = process.env.PORT || 5000;
 const ObjectId = require('mongodb').ObjectId;
 const { MongoClient } = require('mongodb');
-const serviceAccount = require('./niche-react-firebase-adminsdk.json');
-const { json } = require('express');
-
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-});
 
 app.use(cors());
 app.use(express.json());
 dotenv.config();
 
+const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+});
 // Mongo Connection
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@sandbox.5jrgy.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, {
