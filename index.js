@@ -105,6 +105,14 @@ async function run() {
       res.json(result);
     });
 
+    // fetch single product
+    app.post('/products/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await productsCollection.findOne(query);
+      res.json(result);
+    });
+
     // Fecth only 6 produtcs
     app.get('/productsHome', async (req, res) => {
       const result = await productsCollection.find({}).limit(6).toArray();
