@@ -41,6 +41,7 @@ async function run() {
     const database = client.db('nicheDB');
     const usersCollection = database.collection('users');
     const productsCollection = database.collection('products');
+    const ordersCollection = database.collection('orders');
 
     // Save user to mongo
     app.post('/users', async (req, res) => {
@@ -131,6 +132,13 @@ async function run() {
       const pdId = req.params.id;
       const query = { _id: ObjectId(pdId) };
       const result = await productsCollection.deleteOne(query);
+      res.json(result);
+    });
+
+    // Add to order
+    app.post('/order', async (req, res) => {
+      const order = req.body;
+      const result = await ordersCollection.insertOne(order);
       res.json(result);
     });
   } finally {
