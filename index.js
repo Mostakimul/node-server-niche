@@ -107,7 +107,7 @@ async function run() {
     });
 
     // fetch single product
-    app.post('/products/:id', async (req, res) => {
+    app.get('/products/:id', async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
       const result = await productsCollection.findOne(query);
@@ -139,6 +139,22 @@ async function run() {
     app.post('/order', async (req, res) => {
       const order = req.body;
       const result = await ordersCollection.insertOne(order);
+      res.json(result);
+    });
+
+    // fetch users orders
+    app.get('/orders/:email', async (req, res) => {
+      const userEmail = req.params.email;
+      const filter = { email: userEmail };
+      const result = await ordersCollection.find(filter).toArray();
+      console.log(result);
+      res.json(result);
+    });
+    // delete an order
+    app.delete('/orders/:id', async (req, res) => {
+      const orderId = req.params.id;
+      const query = { _id: ObjectId(orderId) };
+      const result = await ordersCollection.deleteOne(query);
       res.json(result);
     });
   } finally {
