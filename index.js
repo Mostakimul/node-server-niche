@@ -42,6 +42,7 @@ async function run() {
     const usersCollection = database.collection('users');
     const productsCollection = database.collection('products');
     const ordersCollection = database.collection('orders');
+    const reviewsCollection = database.collection('reviews');
 
     // Save user to mongo
     app.post('/users', async (req, res) => {
@@ -179,6 +180,13 @@ async function run() {
         options
       );
       res.send(result);
+    });
+
+    // Add review
+    app.post('/reviews', async (req, res) => {
+      const review = req.body;
+      const result = await reviewsCollection.insertOne(review);
+      res.json(result);
     });
   } finally {
     // await client.close();
