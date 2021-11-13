@@ -135,6 +135,12 @@ async function run() {
       res.json(result);
     });
 
+    // Fetch all orders
+    app.get('/orders', async (req, res) => {
+      const result = await ordersCollection.find({}).toArray();
+      res.json(result);
+    });
+
     // Add to order
     app.post('/order', async (req, res) => {
       const order = req.body;
@@ -147,7 +153,6 @@ async function run() {
       const userEmail = req.params.email;
       const filter = { email: userEmail };
       const result = await ordersCollection.find(filter).toArray();
-      console.log(result);
       res.json(result);
     });
     // delete an order
@@ -156,6 +161,24 @@ async function run() {
       const query = { _id: ObjectId(orderId) };
       const result = await ordersCollection.deleteOne(query);
       res.json(result);
+    });
+    // Change order status
+    app.put('/ordersStatus/:id', async (req, res) => {
+      const id = req.params.id;
+      const updatedUser = req.body;
+      const filter = { _id: ObjectId(id) };
+      const options = { upsert: true };
+      const updateDoc = {
+        $set: {
+          status: updatedUser.status,
+        },
+      };
+      const result = await ordersCollection.updateOne(
+        filter,
+        updateDoc,
+        options
+      );
+      res.send(result);
     });
   } finally {
     // await client.close();
